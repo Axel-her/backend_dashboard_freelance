@@ -4,7 +4,7 @@ import { MissionController } from './mission.controller';
 import { PrismaService } from '../database/prisma.service';
 
 @Module({
-  controllers: [MissionController],
   providers: [MissionService, PrismaService],
+  controllers: [MissionController],
 })
 export class MissionModule {}
