@@ -10,21 +10,24 @@ generator client {
 }
 
 // 3. model
-model Mission {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String?
-  tjm         Int
-  duree       Int
-  client      String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  missions  Mission[] 
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
-model User {
+model Mission {
   id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
+  title     String
+  description String?
+  tjm       Int
+  duree     Int
+  client    String
+  userId    Int     
+  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

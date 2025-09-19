@@ -8,12 +8,19 @@ import { PrismaService } from '../database/prisma.service';
 export class MissionService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createMission(createMissionDto: CreateMissionDto): Promise<Mission> {
-    return this.prismaService.getPrisma().mission.create({ data: createMissionDto });
+  async createMission(createMissionDto: CreateMissionDto, userId: number): Promise<Mission> {
+    return this.prismaService.getPrisma().mission.create({ 
+      data: {
+        ...createMissionDto,
+        userId,
+      } 
+    });
   }
 
-  async findAllMissions(): Promise<Mission[]> {
-    return this.prismaService.getPrisma().mission.findMany();
+  async findAllMissions(userId: number): Promise<Mission[]> {
+    return this.prismaService.getPrisma().mission.findMany({
+      where: { userId },
+    });
   }
 
   async findOneMission(id: number): Promise<Mission> {
