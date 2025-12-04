@@ -1,7 +1,7 @@
 // 1. Datasource
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL") 
+  url = env("DATABASE_URL")
 }
 
 // 2. Generator

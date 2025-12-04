@@ -24,17 +24,20 @@ export class MissionController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.missionService.findOneMission(Number(id));
+  findOne(@Param('id') id: string, @Req() req: Request) {
+    const userId = (req.user as any).userId;
+    return this.missionService.findOneMissionForUser(userId, Number(id));
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMissionDto: UpdateMissionDto) {
-    return this.missionService.updateMission(Number(id), updateMissionDto);
+  update(@Param('id') id: string, @Body() updateMissionDto: UpdateMissionDto, @Req() req: Request) {
+    const userId = (req.user as any).userId;
+    return this.missionService.updateMissionForUser(userId, Number(id), updateMissionDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.missionService.removeMission(Number(id));
+  remove(@Param('id') id: string, @Req() req: Request) {
+    const userId = (req.user as any).userId;
+    return this.missionService.removeMissionForUser(userId, Number(id));
   }
 }
