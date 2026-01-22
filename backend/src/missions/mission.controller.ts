@@ -11,6 +11,12 @@ import type { Request } from 'express';
 export class MissionController {
   constructor(private readonly missionService: MissionService) {}
 
+  @Get('dashboard')
+  getDashboard(@Req() req: Request) {
+    const userId = (req.user as any).userId;
+    return this.missionService.getDashboardData(userId);
+  }
+
   @Post()
   create(@Body() createMissionDto: CreateMissionDto, @Req() req: Request) {
     const userId = (req.user as any).userId;
@@ -40,4 +46,5 @@ export class MissionController {
     const userId = (req.user as any).userId;
     return this.missionService.removeMissionForUser(userId, Number(id));
   }
+
 }

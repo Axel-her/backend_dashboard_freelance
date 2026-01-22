@@ -22,8 +22,8 @@ export class MissionService {
 
   // secure: retourne uniquement si la mission appartient à userId
   async findOneMissionForUser(userId: number, id: number): Promise<Mission> {
-    const mission = await this.prismaService.getPrisma().mission.findFirst({ where: { id, userId } });
-    if (!mission) throw new NotFoundException('Mission not found or not owned');
+    const mission = await this.prismaService.getPrisma().mission.findUnique({ where: { id: id } });
+    if (!mission || mission.userId !== userId) throw new NotFoundException('Mission not found or not owned');
     return mission;
   }
 
@@ -32,18 +32,38 @@ export class MissionService {
       where: { id, userId },
       data: updateMissionDto,
     });
-    if (updated.count === 0)
-    throw new NotFoundException('Mission not found or not owned');
-  // On récupère la mission mise à jour pour la renvoyer
-  const mission = await this.prismaService.getPrisma().mission.findUnique({
-    where: { id },
-  });
-  if (!mission) throw new NotFoundException('Mission not found after update');
-   return mission;
-}
+    if (updated.count === 0) {
+      throw new NotFoundException('Mission not found or not owned');
+    }
+    // On récupère la mission mise à jour pour la renvoyer
+    const mission = await this.prismaService.getPrisma().mission.findUnique({
+      where: { id },
+    });
+    if (!mission) throw new NotFoundException('Mission not found after update');
+    return mission;
+  }
 
   async removeMissionForUser(userId: number, id: number): Promise<void> {
     const deleted = await this.prismaService.getPrisma().mission.deleteMany({ where: { id, userId } });
     if (deleted.count === 0) throw new NotFoundException('Mission not found or not owned');
+  }
+
+  async getDashboardData(userId: number) {
+    const missions = await this.findAllMissions(userId);
+
+    const totalRevenue = missions.reduce((sum, mission) => sum + (mission.tjm * mission.duree), 0);
+    const numberOfMissions = missions.length;
+    const numberOfClients = new Set(missions.map(m => m.client)).size;
+
+    const latestMissions = missions
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 3);
+
+    return {
+      totalRevenue,
+      numberOfMissions,
+      numberOfClients,
+      latestMissions,
+    };
   }
 }
