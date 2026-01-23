@@ -1,5 +1,5 @@
 // src/missions/dto/create-mission.dto.ts
-import { IsString, IsOptional, IsInt } from 'class-validator';
+import { IsString, IsOptional, IsInt, IsDate } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateMissionDto {
@@ -20,4 +20,9 @@ export class CreateMissionDto {
 
   @IsString()
   client: string;
+
+  @Type(() => Date)
+  @IsOptional()
+  @IsDate()
+  startDate?: Date;
 }
