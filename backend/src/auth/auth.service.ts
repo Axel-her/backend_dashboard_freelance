@@ -29,4 +29,13 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
     };
   }
+
+  async getProfile(userId: number) {
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    const { password, ...result } = user;
+    return result;
+  }
 }
