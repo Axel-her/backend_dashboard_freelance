@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete, UseGuards, Req, Query, ParseIntPipe } from '@nestjs/common';
 import { MissionService } from './mission.service';
 import { CreateMissionDto } from './dto/create-mission.dto';
 import { UpdateMissionDto } from './dto/update-mission.dto';
@@ -17,32 +17,41 @@ export class MissionController {
     return this.missionService.getDashboardData(userId);
   }
 
+  @Get('paginated')
+  getMissionsPaginated(@Query('page') page: string, @Query('limit') limit: string, @Req() req: Request, @Query('year') year?: string) {
+    const userId = (req.user as any).userId;
+    const pageNum = parseInt(page, 10) || 1;
+    const limitNum = parseInt(limit, 10) || 10;
+    const yearNum = year ? parseInt(year, 10) : undefined;
+    return this.missionService.getMissionsPaginated(userId, pageNum, limitNum, yearNum);
+  }
+
+  @Get('years')
+  getAvailableYears(@Req() req: Request) {
+    const userId = (req.user as any).userId;
+    return this.missionService.getAvailableYears(userId);
+  }
+
   @Post()
   create(@Body() createMissionDto: CreateMissionDto, @Req() req: Request) {
     const userId = (req.user as any).userId;
     return this.missionService.createMission(createMissionDto, userId);
   }
 
-  @Get()
-  findAll(@Req() req: Request) {
-    const userId = (req.user as any).userId;
-    return this.missionService.findAllMissions(userId);
-  }
-
   @Get(':id')
-  findOne(@Param('id') id: string, @Req() req: Request) {
+  findOne(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
     const userId = (req.user as any).userId;
     return this.missionService.findOneMissionForUser(userId, Number(id));
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMissionDto: UpdateMissionDto, @Req() req: Request) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateMissionDto: UpdateMissionDto, @Req() req: Request) {
     const userId = (req.user as any).userId;
     return this.missionService.updateMissionForUser(userId, Number(id), updateMissionDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @Req() req: Request) {
+  remove(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
     const userId = (req.user as any).userId;
     return this.missionService.removeMissionForUser(userId, Number(id));
   }

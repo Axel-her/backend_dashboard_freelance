@@ -66,4 +66,44 @@ export class MissionService {
       latestMissions,
     };
   }
+
+  async getMissionsPaginated(userId: number, page: number, limit: number, year?: number) {
+    const missions = await this.findAllMissions(userId);
+    let filteredMissions = missions;
+
+    // Filtrer par année si spécifiée
+    if (year) {
+      filteredMissions = missions.filter(mission => {
+        if (!mission.startDate) return false;
+        const missionYear = new Date(mission.startDate).getFullYear();
+        return missionYear === year;
+      });
+    }
+
+    const sortedMissions = filteredMissions.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    const total = sortedMissions.length;
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedMissions = sortedMissions.slice(startIndex, endIndex);
+
+    return {
+      missions: paginatedMissions,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  async getAvailableYears(userId: number): Promise<number[]> {
+    const missions = await this.findAllMissions(userId);
+    const years = new Set<number>();
+    missions.forEach(mission => {
+      if (mission.startDate) {
+        years.add(new Date(mission.startDate).getFullYear());
+      }
+    });
+    return Array.from(years).sort((a, b) => b - a); // Trier par année décroissante
+  }
 }
