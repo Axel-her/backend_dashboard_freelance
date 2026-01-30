@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMissionDto } from './dto/create-mission.dto';
 import { UpdateMissionDto } from './dto/update-mission.dto';
-import { Mission } from '@prisma/client';
+import {Mission} from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
 
 
